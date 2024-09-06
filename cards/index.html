@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BJP Card Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #ff9900; /* BJP Orange */
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #cc7a00; /* Darker Orange */
+        }
+        .preview {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .preview img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 50%;
+        }
+        .logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://crystalpng.com/wp-content/uploads/2023/05/bjp-logo-png-1024x1024.png" alt="BJP Logo">
+        </div>
+        <h1>BJP Card Generator</h1>
+        <form id="cardForm">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="text" id="age" required>
+            </div>
+            <div class="form-group">
+                <label for="photo">Profile Photo</label>
+                <input type="file" id="photo" accept="image/*">
+                <div class="preview" id="photoPreview"></div>
+            </div>
+            <div class="form-group">
+                <label for="contact">Contact Number</label>
+                <input type="text" id="contact" required>
+            </div>
+            <button type="submit">Generate PDF</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        document.getElementById('photo').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    const preview = document.getElementById('photoPreview');
+                    preview.innerHTML = '';
+                    preview.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('cardForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            const contact = document.getElementById('contact').value;
+            const photo = document.getElementById('photoPreview').querySelector('img');
+            const photoSrc = photo ? photo.src : '';
+
+            // Add BJP Logo
+            doc.addImage('bjp-logo.png', 'PNG', 10, 10, 50, 20); // Adjust coordinates and size as needed
+
+            doc.setFontSize(22);
+            doc.setTextColor('#ff9900'); // BJP Orange
+            doc.text("BJP Membership Card", 105, 40, { align: "center" });
+
+            doc.setFontSize(16);
+            doc.setTextColor('#000000');
+            doc.text(`Name: ${name}`, 10, 60);
+            doc.text(`Age: ${age}`, 10, 70);
+            doc.text(`Contact: ${contact}`, 10, 80);
+
+            if (photoSrc) {
+                doc.addImage(photoSrc, 'JPEG', 10, 90, 50, 50);
+            }
+
+            doc.save('bjp_card.pdf');
+        });
+    </script>
+</body>
+</html>
